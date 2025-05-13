@@ -318,16 +318,32 @@ section { position: relative; overflow: hidden; }
     height: var(--header-height);
     background: var(--bg-dark);
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center;
+    flex-direction: column;
   }
 
-  /* Логотип всегда статичен */
   .logo {
-    position: static !important;
+    width: 100%;
+    text-align: center;
     order: -1;
-    margin: 0 !important;
-    transform: none !important;
+    margin: 0 auto !important;
+    padding: 10px 0;
+  }
+
+  .logo img {
+    max-width: 300px; /* Увеличили размер */
+    width: auto;
+    height: auto;
+    max-height: 80px; /* Ограничение высоты */
+    display: inline-block; /* Для центрирования через text-align */
+    margin: 0 auto;
+    position: static; /* Убрали position: center (невалидное значение) */
+  }
+
+  .main-nav {
+    flex-direction: column;
+    align-items: center;
   }
 
   /* Выпадающее меню-шторка */
