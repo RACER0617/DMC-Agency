@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let originalNavContent = null; // Сохраняем исходную структуру меню
-  let isMobileMenuInitialized = false; // Флаг инициализации мобильного меню
+  let originalNavContent = null;
+  let isMobileMenuInitialized = false;
+  const nav = document.querySelector('.main-nav');
 
   // Анимация при загрузке
   const initAnimations = () => {
     const animateElements = document.querySelectorAll('[data-animate]');
-    
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const delay = entry.target.dataset.delay || 0;
+          const delay = parseInt(entry.target.dataset.delay, 10) || 0;
           setTimeout(() => {
             entry.target.classList.add('animated');
           }, delay);
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }, { threshold: 0.1 });
 
-    animateElements.forEach(element => observer.observe(element));
+    animateElements.forEach(el => observer.observe(el));
 
     window.addEventListener('load', () => {
       document.body.classList.add('loaded');
@@ -27,17 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Мобильное меню
+  // Инициализация мобильного меню (≤ 1200px)
   const initMobileMenu = () => {
     if (isMobileMenuInitialized) return;
     isMobileMenuInitialized = true;
-    
-    const nav = document.querySelector('.main-nav');
-    originalNavContent = nav.innerHTML; // Сохраняем оригинал
 
-    // Создаем структуру для мобильной версии
+    // Сохраняем исходную разметку
+    originalNavContent = nav.innerHTML;
+
+    // Собираем мобильную структуру
     const mobileStructure = `
-      <a href="index.html" class="logo">
+      <a href="index.html" class="logo" data-animate data-delay="400">
         <img src="myaat5cnway51.webp" alt="DMC Logo">
       </a>
       <div class="dropdown">
@@ -47,58 +47,77 @@ document.addEventListener('DOMContentLoaded', () => {
           .join('')}
       </div>
     `;
-    
     nav.innerHTML = mobileStructure;
-    
-    // Обработчик клика на логотип
-    document.querySelector('.logo').addEventListener('click', (e) => {
-      if (window.innerWidth > 768) return;
-      e.preventDefault();
-      nav.classList.toggle('active');
-    });
   };
 
-  // Восстановление десктопного меню
+  // Восстановление десктопного меню (> 1200px)
   const restoreDesktopMenu = () => {
     if (!originalNavContent) return;
-    const nav = document.querySelector('.main-nav');
     nav.innerHTML = originalNavContent;
     isMobileMenuInitialized = false;
   };
 
-  // Адаптация меню
+  // Переключение между мобильным и десктопным меню
   const handleResponsiveMenu = () => {
-    window.innerWidth <= 768 ? initMobileMenu() : restoreDesktopMenu();
+    if (window.innerWidth <= 1200) {
+      initMobileMenu();
+    } else {
+      restoreDesktopMenu();
+    }
   };
 
-  // Основная инициализация
-  const init = () => {
-    initAnimations();
-    handleResponsiveMenu();
-    
-    // Обработчики кнопок
-    document.querySelectorAll('.btn-order').forEach(btn => {
-      btn.addEventListener('click', () => window.location.href = 'order.html');
-    });
+  // Делегированное событие клика по логотипу для открытия/закрытия меню
+  nav.addEventListener('click', (e) => {
+    const logo = e.target.closest('.logo');
+    if (!logo) return;
+    if (window.innerWidth > 1200) return;
+    e.preventDefault();
+    nav.classList.toggle('active');
+  });
 
-    // Скролл-анимации
-    let lastScroll = 0;
+  // Обработчики других элементов
+  const bindButtons = () => {
+    document.querySelectorAll('.btn-order').forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.location.href = 'order.html';
+      });
+    });
+  };
+
+  // Анимации при скролле
+  const initScrollAnimations = () => {
+    let lastScroll = window.pageYOffset;
     window.addEventListener('scroll', () => {
-      const direction = window.pageYOffset > lastScroll ? 'down' : 'up';
-      lastScroll = window.pageYOffset;
-      
+      const currentScroll = window.pageYOffset;
+      const direction = currentScroll > lastScroll ? 'down' : 'up';
+      lastScroll = currentScroll;
+
       document.querySelectorAll('[data-animate]').forEach(el => {
-        if (el.getBoundingClientRect().top < window.innerHeight * 0.8 && direction === 'down') {
-          setTimeout(() => el.classList.add('animated'), el.dataset.delay || 0);
+        const delay = parseInt(el.dataset.delay, 10) || 0;
+        if (
+          el.getBoundingClientRect().top < window.innerHeight * 0.8 &&
+          direction === 'down' &&
+          !el.classList.contains('animated')
+        ) {
+          setTimeout(() => el.classList.add('animated'), delay);
         }
       });
     }, { passive: true });
   };
 
-  // Запуск
+  // Инициализация всего
+  const init = () => {
+    initAnimations();
+    handleResponsiveMenu();
+    bindButtons();
+    initScrollAnimations();
+  };
+
   init();
+
+  // Пересчёт при изменении размера окна
   window.addEventListener('resize', () => {
     handleResponsiveMenu();
-    document.querySelector('.main-nav').classList.remove('active');
+    nav.classList.remove('active');
   });
 });

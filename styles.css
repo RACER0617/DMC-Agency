@@ -503,9 +503,108 @@ section { position: relative; overflow: hidden; }
   }
 }
 
-/* Отключение мобильных стилей на десктопе */
-@media (min-width: 769px) {
-  .mobile-home, .dropdown {
+/* Медиазапрос для планшетов/ноутбуков до 1200px — повторяет логику мобильной шапки */
+@media (max-width: 1200px) {
+  /* Фиксация шапки */
+  .site-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 0 1rem;
+    height: var(--header-height);
+    background: var(--bg-dark);
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  /* Логотип */
+  .logo {
+    width: 100%;
+    text-align: center;
+    order: -1;
+    margin: 0 auto !important;
+    padding: 10px 0;
+  }
+  .logo img {
+    max-width: 300px;
+    width: auto;
+    height: auto;
+    max-height: 80px;
+    display: inline-block;
+    margin: 0 auto;
+    position: static;
+  }
+
+  /* Главное меню в столбик */
+  .main-nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Выпадающее меню-шторка */
+  .dropdown {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    background: var(--bg-dark);
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0;
+    text-align: center;
+  }
+
+  /* Активное состояние меню */
+  .main-nav.active .dropdown {
+    max-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  /* Стили пунктов меню */
+  .main-nav a {
+    font-size: 1.4rem;
+    padding: 1rem;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: slideDown 0.3s forwards;
+  }
+  .main-nav.active a:nth-child(1) { animation-delay: 0.1s; }
+  .main-nav.active a:nth-child(2) { animation-delay: 0.2s; }
+  .main-nav.active a:nth-child(3) { animation-delay: 0.3s; }
+  .main-nav.active a:nth-child(4) { animation-delay: 0.4s; }
+
+  /* Пункт "Главная" */
+  .mobile-home {
+    display: block !important;
+    order: 1;
+  }
+
+  /* Скрываем десктопные пункты, пока меню не открыто */
+  .main-nav:not(.active) > a:not(.logo) {
+    display: none !important;
+  }
+
+  /* Анимация появления пунктов */
+  @keyframes slideDown {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Отключение планшетно-мобильных стилей на широких экранах */
+@media (min-width: 1201px) {
+  .mobile-home,
+  .dropdown {
     display: none !important;
   }
 }
+
